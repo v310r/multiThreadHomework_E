@@ -1,0 +1,6 @@
+thread_id [7fb4be0ee740] [main.cpp | main: 78] [Thu Aug  5 21:40:05 2021]     Hello from main!
+thread_id [7fb4be0ed700] [main.cpp | foo1: 72] [Thu Aug  5 21:40:05 2021]         Hello from foo1!
+thread_id [7fb4be0ed700] [main.cpp | foo2: 68] [Thu Aug  5 21:40:05 2021]             Hello from foo2!
+thread_id [7fb4bd8ec700] [main.cpp | foo3: 63] [Thu Aug  5 21:40:05 2021]         Hello from foo2!
+thread_id [7fb4bd8ec700] [main.cpp | foo4: 58] [Thu Aug  5 21:40:05 2021]             Hello from foo2!
+thread_id [7fb4bd8ec700] [main.cpp | foo5: 54] [Thu Aug  5 21:40:05 2021]                 Hello from foo2!

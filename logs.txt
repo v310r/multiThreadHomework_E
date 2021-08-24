@@ -1,21 +1,7 @@
-thread_id [7f64efddb740] [main.cpp | main: 136] [Fri Aug  6 20:02:25 2021] Hello from main!
-thread_id [7f64ef5d9700] [main.cpp | foo1: 126] [Fri Aug  6 20:02:25 2021]   Hello from foo1!
-thread_id [7f64ef5d9700] [main.cpp | foo2: 122] [Fri Aug  6 20:02:25 2021]     Hello from foo2!
-thread_id [7f64eedd8700] [main.cpp | foo1: 126] [Fri Aug  6 20:02:25 2021]   Hello from foo1!
-thread_id [7f64eedd8700] [main.cpp | foo2: 122] [Fri Aug  6 20:02:25 2021]     Hello from foo2!
-thread_id [7f64ee5d7700] [main.cpp | foo1: 126] [Fri Aug  6 20:02:25 2021]   Hello from foo1!
-thread_id [7f64eddd6700] [main.cpp | foo1: 126] [Fri Aug  6 20:02:25 2021]   Hello from foo1!
-thread_id [7f64ed5d5700] [main.cpp | foo1: 126] [Fri Aug  6 20:02:25 2021]   Hello from foo1!
-thread_id [7f64eddd6700] [main.cpp | foo2: 122] [Fri Aug  6 20:02:25 2021]     Hello from foo2!
-thread_id [7f64ecdd4700] [main.cpp | foo1: 126] [Fri Aug  6 20:02:25 2021]   Hello from foo1!
-thread_id [7f64dffff700] [main.cpp | foo1: 126] [Fri Aug  6 20:02:25 2021]   Hello from foo1!
-thread_id [7f64de7fc700] [main.cpp | foo1: 126] [Fri Aug  6 20:02:25 2021]   Hello from foo1!
-thread_id [7f64deffd700] [main.cpp | foo1: 126] [Fri Aug  6 20:02:25 2021]   Hello from foo1!
-thread_id [7f64deffd700] [main.cpp | foo2: 122] [Fri Aug  6 20:02:25 2021]     Hello from foo2!
-thread_id [7f64ed5d5700] [main.cpp | foo2: 122] [Fri Aug  6 20:02:25 2021]     Hello from foo2!
-thread_id [7f64ecdd4700] [main.cpp | foo2: 122] [Fri Aug  6 20:02:25 2021]     Hello from foo2!
-thread_id [7f64ee5d7700] [main.cpp | foo2: 122] [Fri Aug  6 20:02:25 2021]     Hello from foo2!
-thread_id [7f64dffff700] [main.cpp | foo2: 122] [Fri Aug  6 20:02:25 2021]     Hello from foo2!
-thread_id [7f64de7fc700] [main.cpp | foo2: 122] [Fri Aug  6 20:02:25 2021]     Hello from foo2!
-thread_id [7f64df7fe700] [main.cpp | foo1: 126] [Fri Aug  6 20:02:25 2021]   Hello from foo1!
-thread_id [7f64df7fe700] [main.cpp | foo2: 122] [Fri Aug  6 20:02:25 2021]     Hello from foo2!
+thread_id [7f93d3bcd740] [main.cpp | main: 160] [2021-08-25 01:21:42.641] Hello from main!
+thread_id [7f93d33cb700] [main.cpp | foo1: 151] [2021-08-25 01:21:42.741]   Hello from foo1!
+thread_id [7f93d2bca700] [main.cpp | foo1: 151] [2021-08-25 01:21:42.741]   Hello from foo1!
+thread_id [7f93d23c9700] [main.cpp | foo1: 151] [2021-08-25 01:21:42.741]   Hello from foo1!
+thread_id [7f93d13c7700] [main.cpp | foo1: 151] [2021-08-25 01:21:42.741]   Hello from foo1!
+thread_id [7f93d1bc8700] [main.cpp | foo1: 151] [2021-08-25 01:21:42.741]   Hello from foo1!
+thread_id [7f93d33cb700] [main.cpp | foo2: 145] [2021-08-25 01:21:42.841]     Hello from foo2!

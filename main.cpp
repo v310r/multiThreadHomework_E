@@ -1,31 +1,35 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
-#include <ctime>
+#include <chrono>
 #include <fstream>
 #include <sstream>
 #include <queue>
 #include <condition_variable>
 
+thread_local int logicSpaces{};
 namespace {std::mutex g_display_mutex, queue_mutex;}
-std::condition_variable cv;
-#define Log(message,spaces) Logger logger(__FILE__, __FUNCTION__, __LINE__, message,spaces)
+std::condition_variable cv,cv_handler;
+#define Log(message) Logger logger(__FILE__, __FUNCTION__, __LINE__, message)
 
 class Clock{
 private:
-    time_t timer;
+    char timer[sizeof("9999-12-31 23:59:59.999")];
 public:
     friend std::ostream& operator<<(std::ostream& out,Clock& clock);
 };
 
 std::ostream& operator<<(std::ostream& out,Clock& clock){
-    time(&clock.timer);
+    using namespace std::chrono;
+    auto timepoint = system_clock::now();
+    auto coarse = system_clock::to_time_t(timepoint);
+    auto fine = time_point_cast<std::chrono::milliseconds>(timepoint);
 
-    std::string current_time = (ctime(&clock.timer));
+    std::snprintf(clock.timer + std::strftime(clock.timer, sizeof(clock.timer) - 3,
+                                         "%F %T.", std::localtime(&coarse)),
+                  4, "%03lu", fine.time_since_epoch().count() % 1000);
 
-    current_time.erase(current_time.end()-1);
-
-    out<<current_time;
+    out<<clock.timer;
 
     return out;
 }
@@ -36,36 +40,44 @@ private:
     std::queue<std::string> q;
 
 public:
-    void push(std::string message){
+    void push(const std::string& message){
+
+        bool checked = false;
 
         std::unique_lock<std::mutex> l(queue_mutex);
 
-        while(q.size() > 5) {
+        if(q.size() <=3)std::cout<<"hasn't been queued "<<message;
+
+        while(q.size() > 3) {
+
+            std::cout<<"has been queued "<<message;
 
             cv.wait(l);
 
-            //print queued messages
-            std::cout<<this->checkFront()<<'\n';
+            checked = true;
         }
 
+        if(checked) {std::cout<<"after waiting in the queue "<<message;checked = false;}
+
         q.push(message);
+
+        cv_handler.notify_one();
     }
+
+
     std::string getAndPop(){
 
         std::unique_lock<std::mutex> l(queue_mutex);
 
         std::string tmp = q.front();
-
+        std::cout<<"Deleting message "<<tmp<<"\n";
         q.pop();
 
         cv.notify_one();
 
         return tmp;
     }
-    std::string checkFront(){
 
-        return q.front();
-    }
 
     int size(){
         return q.size();
@@ -89,28 +101,37 @@ std::string spaces = "";
 
 public:
     template<class T>
-    Logger(const char* file,const char* function,int line,T message,int spaces) {
+    Logger(const char* file,const char* function,int line,T message) {
+        for(int i = 0; i<logicSpaces;++i){
 
-        for(int i = 0; i<spaces;++i){
-
-            this->spaces += "  ";
+            spaces += "  ";
         }
 
         buffer << "thread_id ["<<std::hex<<std::this_thread::get_id()<<"] ["<<file<<" | "<<function<<
-        ": "<<std::dec<<line<<"] ["<<dateAndTime<<"] "<<this->spaces<<message<<"\n";
+        ": "<<std::dec<<line<<"] ["<<dateAndTime<<"] "<<spaces<<message<<"\n";
         
         sq.push(buffer.str());
     }
 
-    static int getQueueSize(){return sq.size();}
+    ~Logger(){
+        --logicSpaces;
+    }   
+
 
     static void handleLogging(){
-        // emulate latency, so that we can check queued messages
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        while(true){
-            if(sq.size()>0)
-                logFile << sq.getAndPop();
+
+        std::unique_lock<std::mutex> l(g_display_mutex);
+
+        while(true) 
+        {
+            
+            while(sq.size() == 0)cv_handler.wait(l);
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+            logFile << sq.getAndPop();
         }
+        
     }
 };
 
@@ -118,40 +139,36 @@ SafeQueue Logger::sq;
 
 std::ofstream Logger::logFile("logs.txt",std::ofstream::app);
 
-void foo2(int spaces){
-    Log("Hello from foo2!",++spaces);
+void foo2(){
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    ++logicSpaces;
+    Log("Hello from foo2!");
 }
 
-void foo1(int spaces){
-    Log("Hello from foo1!",++spaces);
-    foo2(spaces);
+void foo1(){
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    ++logicSpaces;
+    Log("Hello from foo1!");
+    foo2();
 }
 
 int main(){
-    int spaces = 0;
     std::thread handler([] () {
         Logger::handleLogging();
     });
     handler.detach();
-    Log("Hello from main!",spaces);
-    std::thread t1(foo1,spaces);
-    std::thread t2(foo1,spaces);
-    std::thread t3(foo1,spaces); 
-    std::thread t4(foo1,spaces);
-    std::thread t5(foo1,spaces);
-    std::thread t6(foo1,spaces);
-    std::thread t7(foo1,spaces);
-    std::thread t8(foo1,spaces);
-    std::thread t9(foo1,spaces);
-    std::thread t10(foo1,spaces);
+    Log("Hello from main!");
+    //no jthread (no C++ 20)
+    std::thread t1(foo1);
+    std::thread t2(foo1);
+    std::thread t3(foo1); 
+    std::thread t4(foo1);
+    std::thread t5(foo1);
+
     t1.join();
     t2.join();
     t3.join();
     t4.join();
     t5.join();
-    t6.join();
-    t7.join();
-    t8.join();
-    t9.join();
-    t10.join();
+
 }

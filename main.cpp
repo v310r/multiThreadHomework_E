@@ -37,7 +37,7 @@ std::ostream& operator<<(std::ostream& out,Clock& clock){
 class SafeQueue{
 private:
 
-    std::queue<std::string> q;
+    std::deque<std::string> q;
 
 public:
     void push(const std::string& message){
@@ -55,13 +55,13 @@ public:
             cv.wait(l);
 
             checked = true;
+
         }
 
         if(checked) {std::cout<<"after waiting in the queue "<<message;checked = false;}
 
-        q.push(message);
+        q.push_front(message);
 
-        cv_handler.notify_one();
     }
 
 
@@ -69,9 +69,17 @@ public:
 
         std::unique_lock<std::mutex> l(queue_mutex);
 
-        std::string tmp = q.front();
+        std::string tmp = q.back();
+
+        std::cout<<"storage Queue before deleting: \n\n";
+
+        for(const auto& message: q){
+            std::cout<<"\t--> "<<message<<"\n";
+        }
+
         std::cout<<"Deleting message "<<tmp<<"\n";
-        q.pop();
+
+        q.pop_back();
 
         cv.notify_one();
 
@@ -111,6 +119,7 @@ public:
         ": "<<std::dec<<line<<"] ["<<dateAndTime<<"] "<<spaces<<message<<"\n";
         
         sq.push(buffer.str());
+        cv_handler.notify_one();
     }
 
     ~Logger(){
@@ -124,15 +133,16 @@ public:
 
         while(true) 
         {
-            
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
             while(sq.size() == 0)cv_handler.wait(l);
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-            logFile << sq.getAndPop();
+            if(sq.size() > 0) logFile << sq.getAndPop();
         }
         
     }
+
+    static int getQueueSize(){return sq.size();}
 };
 
 SafeQueue Logger::sq;
@@ -140,13 +150,13 @@ SafeQueue Logger::sq;
 std::ofstream Logger::logFile("logs.txt",std::ofstream::app);
 
 void foo2(){
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     ++logicSpaces;
     Log("Hello from foo2!");
 }
 
 void foo1(){
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     ++logicSpaces;
     Log("Hello from foo1!");
     foo2();
@@ -171,4 +181,6 @@ int main(){
     t4.join();
     t5.join();
 
+    while(Logger::getQueueSize()!=0){cv_handler.notify_one();}
+    
 }
